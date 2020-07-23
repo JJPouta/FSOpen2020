@@ -8,12 +8,20 @@ const Header = (props) => {
 
 }
 
-const Content = (props) => {
-
-return(<p>{props.contentID} {props.eAmount}</p>
-  )
+const Content = () => {
+  return(<div>
+      <Part contentID='Half Stack application development' eAmount={10}/>
+      <Part contentID='Using props to pass data' eAmount={7}/>
+      <Part contentID='State of a component' eAmount={14}/>
+    </div>)
 }
 
+const Part = (props) => 
+{
+  return(<p>{props.contentID} {props.eAmount}</p>
+    )
+  
+}
 const Total = (props) => {
 
 return (<p>Number of exercises {props.totalAmount}</p>)
@@ -21,19 +29,14 @@ return (<p>Number of exercises {props.totalAmount}</p>)
 
 const App = () => {
   const course = 'Half Stack application development'
-  const part1 = 'Fundamentals of React'
   const exercises1 = 10
-  const part2 = 'Using props to pass data'
   const exercises2 = 7
-  const part3 = 'State of a component'
   const exercises3 = 14
 
   return (
     <div>
       <Header headerName={course}/>
-      <Content contentID={part1} eAmount={exercises1}/>
-      <Content contentID={part2} eAmount={exercises2}/>
-      <Content contentID={part3} eAmount={exercises3}/>
+      <Content/>
       <Total totalAmount={exercises1+exercises2+exercises3}/>
     </div>
   )
