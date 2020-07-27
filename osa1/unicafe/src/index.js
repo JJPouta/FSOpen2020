@@ -11,33 +11,43 @@ const Button = (props) => (
 
 )
 
-
-
 const Statistics = (props) => {
-
   if(props.allCount > 0)
   {
-    return(<div>
-      <Results text="Good" value={props.goodCount} />
-      <Results text="Neutral" value={props.neutralCount} />
-      <Results text="Bad" value={props.badCount} />
-      <Results text="All" value={props.allCount} />
-      <Results text="Average" value={props.avg}/>
-      <Results text="Positive" value={props.positivePctg}/>
-    </div>)
+    return(<table>
+      <tr>
+        <td>Good</td>
+        <td>{props.goodCount}</td>
+      </tr>
+      <tr>
+        <td>Neutral</td>
+        <td>{props.neutralCount}</td>
+      </tr>
+      <tr>
+        <td>Bad</td>
+        <td>{props.badCount}</td>
+      </tr>
+      <tr>
+        <td>All</td>
+        <td>{props.allCount}</td>
+      </tr>
+      <tr>
+        <td>Average</td>
+        <td>{props.avg}</td>
+      </tr>
+      <tr>
+        <td>Positive</td>
+        <td>{props.positivePctg}</td>
+      </tr>
+    </table>)
   }
   else
   {
-    return(<div>
-      <Results text="No feedback given"/>
-    </div>)
-
+    return(<p>No feedback given</p>)
   }
 }
 
-
-
-const Results = (props) => (
+const StatisticLine  = (props) => (
   <p style={{color: "grey",fontSize: "14pt"}}>{props.text} {props.value} </p>
 )
 
