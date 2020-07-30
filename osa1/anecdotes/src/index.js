@@ -67,14 +67,16 @@ const App = () => {
   const voteAnecdote = (indx) => {
     const newPoints = [...points]
     newPoints[indx] = newPoints[indx] + 1
+    updateCurrentVotes();
     keepScore(newPoints)
-    getMostVoted();
+    getMostVoted(newPoints);
   }
 
-  const getMostVoted = () => {
+  const updateCurrentVotes = () => {return(setSelected(selected,selected.votes += 1))}
+  const getMostVoted = (props) => {
     
-    const maxVotes = Math.max(...points)
-    const getMaxVotedIndex = () => {return(points.indexOf(maxVotes))}
+    const maxVotes = Math.max(...props)
+    const getMaxVotedIndex = () => {return(props.indexOf(maxVotes))}
     const maxVotedIndex = getMaxVotedIndex();
     const mostVotedAnectode = {
       votes: maxVotes,
