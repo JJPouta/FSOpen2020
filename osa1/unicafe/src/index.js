@@ -47,10 +47,6 @@ const Statistics = (props) => {
   }
 }
 
-const StatisticLine  = (props) => (
-  <p style={{color: "grey",fontSize: "14pt"}}>{props.text} {props.value} </p>
-)
-
 
 
 const App = () => {
@@ -58,6 +54,7 @@ const App = () => {
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
+
 
   let clicks = good + neutral + bad;
   
@@ -74,6 +71,7 @@ const App = () => {
     return((good/clicks) * 100 + "%")
 
   }
+
 
   return (
     <div>

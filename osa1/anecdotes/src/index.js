@@ -11,6 +11,31 @@ const Button = (props) => (
 
 )
 
+const AnecdoteLine = ({text,votes}) => {
+
+    if(text)
+    {
+      return(<p style={{fontWeight:"bold"}}>{text} has {votes} votes</p>)
+
+    }
+    else
+    {
+      return(<p></p>)
+    }
+}
+
+
+const VoteLine = (props) => {
+
+  if(props.voteCount > 0){return(
+
+    <p style={{fontWeight:"bold"}}>{props.mostVoted} with {props.voteCount} votes</p>
+  )}
+  else
+  {
+    return(<p style={{fontWeight:"bold"}}>No votes given</p>)
+  }
+}
 
 const anecdotes = [
   'If it hurts, do it more often',
@@ -26,31 +51,47 @@ const App = () => {
 
   const [selected, setSelected] = useState("")
   const [mostVoted,setVoted] = useState("")
-  const points = new Uint8Array(anecdotes.length); 
-  const copyOfPoints = {...points};
-
-  let maxVotes = 0;
-
-  const randomAnecdote = () => {return(anecdotes[Math.floor(Math.random() * Math.floor(anecdotes.length))])}
+  const [points,keepScore] = useState(new Uint8Array(anecdotes.length)); 
   
-  const voteAnecdote = () => {
-
-    let anecdoteIndx = anecdotes.indexOf(selected);
-    copyOfPoints[anecdoteIndx] += 1;
-    let largest = Math.max.apply(Math, copyOfPoints); 
-    let indxOfLargest = anecdotes.indexOf(largest);
-    return(anecdotes[indxOfLargest])
+  const randomAnecdote = () => {
+    
+    const newIndex = Math.floor(Math.random() * Math.floor(anecdotes.length))
+    const newValue = {
+      index: newIndex,
+      text:anecdotes[newIndex],
+      votes:points[newIndex]
+    }
+    setSelected(newValue)
+  }
+  
+  const voteAnecdote = (indx) => {
+    const newPoints = [...points]
+    newPoints[indx] = newPoints[indx] + 1
+    keepScore(newPoints)
+    getMostVoted();
   }
 
+  const getMostVoted = () => {
+    
+    const maxVotes = Math.max(...points)
+    const getMaxVotedIndex = () => {return(points.indexOf(maxVotes))}
+    const maxVotedIndex = getMaxVotedIndex();
+    const mostVotedAnectode = {
+      votes: maxVotes,
+      text: anecdotes[maxVotedIndex]
+    }
+    setVoted(mostVotedAnectode)
+
+  }
 
   return (
     <div>
       <h1 style={{color:"purple",textShadow:"grey 2px 2px 2px"}}>Anecdote of the day</h1>
-      <Button handleClick={() => setVoted(voteAnecdote())} text="vote" margin="10px" bgColor="silver"/>
-      <Button handleClick={() => setSelected(randomAnecdote())} text="next anecdote" bgColor="gold"/>
-      <p style={{fontWeight:"bold"}}>{selected}</p>
+      <Button handleClick={() => voteAnecdote(selected.index)} text="vote" margin="10px" bgColor="silver"/>
+      <Button handleClick={() => randomAnecdote()} text="next anecdote" bgColor="gold"/>
+      <AnecdoteLine text={selected.text} votes={selected.votes}></AnecdoteLine>
       <h1 style={{color:"purple",textShadow:"grey 2px 2px 2px"}}>Anecdote with most votes</h1>
-      <p style={{fontWeight:"bold"}}>{mostVoted} with {maxVotes} votes</p>
+      <VoteLine voteCount={mostVoted.votes} mostVoted={mostVoted.text}/>
     </div>
   )
 }
