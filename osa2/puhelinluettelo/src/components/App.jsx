@@ -11,9 +11,14 @@ const Persons = ({contacts}) => {
 
 const App = () => {
   const [ persons, setPersons] = useState([
-    { name: 'Arto Hellas',number: "040-1231244" }
-  ]) 
+    { name: 'Arto Hellas', number: '040-123456' },
+    { name: 'Ada Lovelace', number: '39-44-5323523' },
+    { name: 'Dan Abramov', number: '12-43-234345' },
+    { name: 'Mary Poppendieck', number: '39-23-6423122' }
+  ])
+  
   const [ newContact, setNewContact ] = useState('')
+  const [ visualData, changeVisualData] = useState(persons)
 
   const addContact = (event) => {
     event.preventDefault()
@@ -31,7 +36,9 @@ const App = () => {
 
     if(!found)
     {
-      setPersons(persons.concat({name: newContact.name,number: newContact.number}))
+      let newPersons = persons.concat({name: newContact.name,number: newContact.number})
+      setPersons(newPersons)
+      changeVisualData(newPersons)
     }
     
   }
@@ -47,18 +54,40 @@ const App = () => {
     }
   }
 
+  const filterContacts = (event) => {
+
+    let inputText = event.target.value;
+    
+    // Jos kenttään on syötetty tietoa
+    if(inputText)
+    {
+      let filteredData = persons.filter(person => person.name.toLowerCase().includes(inputText.toLowerCase()))
+      changeVisualData(filteredData)
+    }
+    else
+    {
+      changeVisualData(persons)
+    }
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
       <form>
-        <div>name: <input id="nameInput" placeholder="Lisää nimi" onChange={handleChange}/></div>  
-        <div>number: <input id="numberInput" placeholder="Lisää numero" onChange={handleChange}/></div>  
+        <div>
+          filter shown with <input id="nameFilter" placeholder="Filter text" onChange={filterContacts}/>
+        </div>
+      </form>
+      <h2>Add new contact</h2>
+      <form>
+        <div>name: <input id="nameInput" placeholder="Add name" onChange={handleChange}/></div>  
+        <div>number: <input id="numberInput" placeholder="Add number" onChange={handleChange}/></div>  
         <div>
           <button type="submit" onClick={addContact}>add</button>
         </div>
       </form>
       <h2>Numbers</h2>
-      <Persons contacts={persons}/>
+      <Persons contacts={visualData}/>
     </div>
   )
 
