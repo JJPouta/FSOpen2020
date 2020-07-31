@@ -1,44 +1,12 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
+import Course from "./components/course"
 
-const Header = (props) => {
-
-  return(
- <h1>{props.headerName}</h1>
- )
-
-}
-
-const Content = (props) => {
-
-  return(<div>
-    {props.courseParts.map(element => <Part key={element.id} contentID={element.name} eAmount={element.exercises}/>)}
-    </div>)
-}
-
-const Part = ({contentID,eAmount}) => 
-{
-  return(<p>{contentID} {eAmount}</p>
-    )
-  
-}
-
-const Course = ({course}) => {
-
-
-const total = course.parts.reduce((tot,currValue) => {return tot + currValue.exercises},0)
-  
-return(
-<div>
-  <Header headerName={course.name}/>
-  <Content courseParts={course.parts}/>
-  <p>Number of exercises {total}</p>
-</div>)
-
-}
 
 const App = () => {
-  const course = {
+  const courses = 
+  [
+    {
     name: 'Half Stack application development',
     id: 1,
     parts: [
@@ -58,11 +26,28 @@ const App = () => {
         id: 3
       }
     ]
-  }
+    },
+    {
+    name: 'Node.js',
+    id: 2,
+    parts: [
+      {
+        name: 'Routing',
+        exercises: 3,
+        id: 1
+      },
+      {
+        name: 'Middlewares',
+        exercises: 7,
+        id: 2
+      }
+    ]}
+  ]
+  
 
   return (
     <div>
-      <Course course={course} />
+      <Course courses={courses} />
     </div>
   )
 }
