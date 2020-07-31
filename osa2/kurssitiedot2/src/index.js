@@ -25,23 +25,16 @@ const Part = ({contentID,eAmount}) =>
 
 const Course = ({course}) => {
 
+
+const total = course.parts.reduce((tot,currValue) => {return tot + currValue.exercises},0)
+  
 return(
 <div>
   <Header headerName={course.name}/>
   <Content courseParts={course.parts}/>
-  <Total courseParts={course.parts}/>
+  <p>Number of exercises {total}</p>
 </div>)
 
-}
-
-
-const Total = ({courseParts}) => {
-
-let i = 0;
-
-courseParts.forEach(element => i = element.exercises + i)
-
-return (<p>Number of exercises {i}</p>)
 }
 
 const App = () => {
