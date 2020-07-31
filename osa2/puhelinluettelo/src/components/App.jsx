@@ -9,6 +9,28 @@ const Persons = ({contacts}) => {
 
 }
 
+const Filter = ({func}) => ( 
+<form>
+  <div>
+    filter shown with <input id="nameFilter" placeholder="Filter text" onChange={func}/>
+  </div>
+</form>)
+
+const AddContacts = ({changeFunc,addFunc}) => (
+
+  <form>
+    <div>name: <input id="nameInput" placeholder="Add name" onChange={changeFunc}/></div>  
+    <div>number: <input id="numberInput" placeholder="Add number" onChange={changeFunc}/></div>  
+    <div>
+      <button type="submit" onClick={addFunc}>add</button>
+    </div>
+  </form>
+)
+
+
+
+
+
 const App = () => {
   const [ persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-123456' },
@@ -73,19 +95,9 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <form>
-        <div>
-          filter shown with <input id="nameFilter" placeholder="Filter text" onChange={filterContacts}/>
-        </div>
-      </form>
+      <Filter func={filterContacts}/>
       <h2>Add new contact</h2>
-      <form>
-        <div>name: <input id="nameInput" placeholder="Add name" onChange={handleChange}/></div>  
-        <div>number: <input id="numberInput" placeholder="Add number" onChange={handleChange}/></div>  
-        <div>
-          <button type="submit" onClick={addContact}>add</button>
-        </div>
-      </form>
+      <AddContacts changeFunc={handleChange} addFunc={addContact}/>
       <h2>Numbers</h2>
       <Persons contacts={visualData}/>
     </div>
