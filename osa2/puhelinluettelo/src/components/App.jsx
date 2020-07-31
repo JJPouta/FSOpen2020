@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 
 
-const Persons = ({names}) => {
-    
+const Persons = ({contacts}) => {
     return(<div>
-        {names.map(contact => <p key={contact.name}>{contact.name}</p>)}
+        {contacts.map(contact => <p key={contact.name}>{contact.name} {contact.number}</p>)}
     </div>)
 
 
@@ -12,9 +11,9 @@ const Persons = ({names}) => {
 
 const App = () => {
   const [ persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
+    { name: 'Arto Hellas',number: "040-1231244" }
   ]) 
-  const [ newName, setNewName ] = useState('Lisää nimi')
+  const [ newContact, setNewContact ] = useState('')
 
   const addContact = (event) => {
     event.preventDefault()
@@ -23,37 +22,43 @@ const App = () => {
 
     persons.forEach(person => {
       
-      if(person.name === newName)
+      if(person.name === newContact.name)
       {
-        alert(`${newName} is already added to phonebook`)
+        alert(`${newContact.name} is already added to phonebook`)
         found = true
       }
     })
 
     if(!found)
     {
-      setPersons(persons.concat({name: newName}))
+      setPersons(persons.concat({name: newContact.name,number: newContact.number}))
     }
     
   }
 
   const handleChange = (event) => {
-    setNewName(event.target.value)
+    if(event.target.id === "nameInput")
+    {
+      setNewContact({...newContact, name: event.target.value})
+    }
+    else if(event.target.id === "numberInput")
+    {
+      setNewContact({...newContact, number: event.target.value})
+    }
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
       <form>
-        <div>
-          name: <input value={newName} onChange={handleChange}/>
-        </div>
+        <div>name: <input id="nameInput" placeholder="Lisää nimi" onChange={handleChange}/></div>  
+        <div>number: <input id="numberInput" placeholder="Lisää numero" onChange={handleChange}/></div>  
         <div>
           <button type="submit" onClick={addContact}>add</button>
         </div>
       </form>
       <h2>Numbers</h2>
-      <Persons names={persons}/>
+      <Persons contacts={persons}/>
     </div>
   )
 
