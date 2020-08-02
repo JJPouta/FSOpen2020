@@ -1,11 +1,18 @@
-import React, { useState } from 'react'
-
+import React, { useState,useEffect } from 'react'
+import axios from 'axios' 
 
 const Persons = ({contacts}) => {
-    return(<div>
-        {contacts.map(contact => <p key={contact.name}>{contact.name} {contact.number}</p>)}
-    </div>)
 
+  if(contacts.length > 0)
+    {
+      return(<div>
+        {contacts.map(contact => <p key={contact.name}>{contact.name} {contact.number}</p>)}
+      </div>)
+    }
+    else
+    {
+      return(<div></div>)
+    }    
 
 }
 
@@ -27,18 +34,9 @@ const AddContacts = ({changeFunc,addFunc}) => (
   </form>
 )
 
-
-
-
-
 const App = () => {
-  const [ persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ])
-  
+ 
+  const [ persons, setPersons] = useState([])
   const [ newContact, setNewContact ] = useState('')
   const [ visualData, changeVisualData] = useState(persons)
 
@@ -91,6 +89,16 @@ const App = () => {
       changeVisualData(persons)
     }
   }
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/db')
+      .then(response => {
+        setPersons(response.data.persons)
+        changeVisualData(response.data.persons)
+        
+      })
+  }, [])
 
   return (
     <div>
