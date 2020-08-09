@@ -1,41 +1,39 @@
 import React, {useEffect,useState} from 'react';
-import ReactDOM from 'react-dom';
 import Axios from "axios";
 
 
   
-const Filter = ({func}) => ( 
-    <form>
-      <div>
-        Find country <input id="nameFilter" placeholder="Enter county" onChange={func}/>
-      </div>
-    </form>)
+const Filter = ({func}) => (<form>
+    <div>
+      Find country <input id="nameFilter" placeholder="Enter county" onChange={func}/>
+    </div>
+  </form>)
+    
 
-const DataView = (props) => {
+const DataView = ({countrylist,func}) => {
 
-    if(props.countrylist.length > 1 && props.countrylist.length < 11)
+
+    if(countrylist.length > 1 && countrylist.length < 11)
     {
-        return(<div>
-            {props.countrylist.map(country => <p key={country.name}>{country.name}</p>)}
-        
+        return(
+        <div>
+            {countrylist.map(country => <p key={country.name}>{country.name} <button id={country.name} onClick={() => func(country)}>show</button></p>)} 
         </div>)
     }
-    else if(props.countrylist.length == 0)
+    else if(countrylist.length === 0)
     {
         return(<div></div>)
     }
-    else if(props.countrylist.length > 10)
+    else if(countrylist.length > 10)
     {
         return(<div>
             <p>Too many matches, specify another filter</p>
         </div>)
     }
-    else if(props.countrylist.length == 1)
+    else if(countrylist.length === 1)
     {
-        
-        return(
-            <SingleCountryView singleCountry={props.countrylist[0]}/>
-       )
+        return(<SingleCountryView singleCountry={countrylist[0]}></SingleCountryView>)
+       
     }
 }
 
@@ -49,7 +47,7 @@ const SingleCountryView = ({singleCountry}) => {
         <ul>
             {singleCountry.languages.map(lang => <li key={lang.name}>{lang.name}</li>)}
         </ul>
-        <img src={singleCountry.flag} style={{maxHeight:"80px",maxWidth:"80px"}}></img>
+        <img src={singleCountry.flag} style={{maxHeight:"80px",maxWidth:"80px"}} alt="flag"></img>
     </div>)
     
 }
@@ -71,15 +69,21 @@ const App = () => {
         }
         else
         {
-            changeShownData(allCountries)
+            changeShownData([])
         }
     }
     
+    const singleCountryView = (country) => {
+
+        changeShownData([country])
+
+    }
+
     useEffect(() => {
         Axios.get("https://restcountries.eu/rest/v2/all")
-        .then(response => {console.log(response.data)
+        .then(response => {
         getCountries(response.data)
-        changeShownData(response.data)})
+        })
 
     },[])
 
@@ -87,7 +91,7 @@ const App = () => {
 return(
 <div>
 <Filter func={filterCountries}></Filter>
-<DataView countrylist={shownCountries}></DataView>
+<DataView countrylist={shownCountries} func={singleCountryView}></DataView>
 </div>)
 }
 
