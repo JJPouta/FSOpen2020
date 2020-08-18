@@ -6,7 +6,7 @@ const Persons = ({contacts,delFunc}) => {
   if(contacts.length > 0)
     {
       return(<div>
-        {contacts.map(contact => <p key={contact.id}>{contact.name} {contact.number} <button key={contact.id} style={{background:"red",color:"white"}} onClick={() => delFunc(contact.id)}>Delete</button></p>
+        {contacts.map(contact => <p key={contact.id}>{contact.name} {contact.number} <button key={contact.id} style={{background:"red",color:"white"}} onClick={() => delFunc(contact.id,contact.name)}>Delete</button></p>
         )}
       </div>)
     }
@@ -54,10 +54,10 @@ const App = () => {
         // Poistutaan jos cancel tai ruksi
         if(!res){return;}
         
-        // Päivitetään numero
+        // Päivitetään numero ja ladataan sivu uudelleen
         contactService
-        .updateExisting(person.id,newContact)
-       
+        .updateExisting(person.id,newContact).then(window.location.reload())
+        
         found = true
         
 
@@ -66,14 +66,11 @@ const App = () => {
 
     if(!found)
     {
+      // Luodaan uusi ja ladataan sivu uudelleen
       contactService
         .createNew(newContact)
-        .then(contactService.getContacts()
-          // Ladataan uudelleen koska palvelin luo ID:n
-          .then(reloadedContacts => {
-          setPersons(reloadedContacts)
-          changeVisualData(reloadedContacts)}))
-    }
+        .then(window.location.reload())}
+        
 
     // Nollataan input kentät
     document.getElementById("nameInput").value = null;
@@ -108,17 +105,10 @@ const App = () => {
     }
   }
 
-  const removeContact = (id) => {
+  const removeContact = (id,name) => {
 
-    let delIndx = null;
-    let personName = null;
 
-    persons.forEach(person => {if(person.id===id){
-      delIndx = persons.indexOf(person)
-      personName = person.name
-    }})
-
-    let res = window.confirm(`Do you want to delete contact: ${personName}?`)
+    let res = window.confirm(`Do you want to delete contact: ${name}?`)
     
     // Poistutaan jos cancel tai ruksi
     if(!res){return;}
