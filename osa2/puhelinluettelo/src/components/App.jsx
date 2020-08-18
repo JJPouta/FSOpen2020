@@ -50,8 +50,17 @@ const App = () => {
       
       if(person.name === newContact.name)
       {
-        alert(`${newContact.name} is already added to phonebook`)
+        let res = window.confirm(`${newContact.name} is already added to phonebook.. replace the old number with new one?`)
+        // Poistutaan jos cancel tai ruksi
+        if(!res){return;}
+        
+        // Päivitetään numero
+        contactService
+        .updateExisting(person.id,newContact)
+       
         found = true
+        
+
       }
     })
 
@@ -65,7 +74,12 @@ const App = () => {
           setPersons(reloadedContacts)
           changeVisualData(reloadedContacts)}))
     }
+
+    // Nollataan input kentät
+    document.getElementById("nameInput").value = null;
+    document.getElementById("numberInput").value = null;
   }
+
 
   const handleChange = (event) => {
     if(event.target.id === "nameInput")
