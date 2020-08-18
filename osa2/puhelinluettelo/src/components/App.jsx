@@ -1,13 +1,13 @@
 import React, { useState,useEffect } from 'react'
-import axios from 'axios' 
 import contactService from "../services/contacts"
 
-const Persons = ({contacts}) => {
+const Persons = ({contacts,delFunc}) => {
 
   if(contacts.length > 0)
     {
       return(<div>
-        {contacts.map(contact => <p key={contact.name}>{contact.name} {contact.number}</p>)}
+        {contacts.map(contact => <p key={contact.id}>{contact.name} {contact.number} <button key={contact.id} style={{background:"red",color:"white"}} onClick={() => delFunc(contact.id)}>Delete</button></p>
+        )}
       </div>)
     }
     else
@@ -59,14 +59,12 @@ const App = () => {
     {
       contactService
         .createNew(newContact)
-        .then(rNewContact => {
-          let newPersons = persons.concat({name: rNewContact.name,number: rNewContact.number})
-          setPersons(newPersons)
-          changeVisualData(newPersons)
-        })
-
+        .then(contactService.getContacts()
+          // Ladataan uudelleen koska palvelin luo ID:n
+          .then(reloadedContacts => {
+          setPersons(reloadedContacts)
+          changeVisualData(reloadedContacts)}))
     }
-    
   }
 
   const handleChange = (event) => {
@@ -96,6 +94,32 @@ const App = () => {
     }
   }
 
+  const removeContact = (id) => {
+
+    let delIndx = null;
+    let personName = null;
+
+    persons.forEach(person => {if(person.id===id){
+      delIndx = persons.indexOf(person)
+      personName = person.name
+    }})
+
+    let res = window.confirm(`Do you want to delete contact: ${personName}?`)
+    
+    // Poistutaan jos cancel tai ruksi
+    if(!res){return;}
+    
+    let newPersons = persons.filter(person => person.id !== id)
+
+    setPersons(newPersons)
+    changeVisualData(newPersons)
+
+    contactService
+    .deleteContact(id)
+
+    
+  }
+  
   useEffect(() => {
     contactService
       .getContacts()
@@ -112,7 +136,7 @@ const App = () => {
       <h2>Add new contact</h2>
       <AddContacts changeFunc={handleChange} addFunc={addContact}/>
       <h2>Numbers</h2>
-      <Persons contacts={visualData}/>
+      <Persons contacts={visualData} delFunc={removeContact}/>
     </div>
   )
 
