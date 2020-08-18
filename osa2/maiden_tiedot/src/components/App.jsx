@@ -15,8 +15,7 @@ const Filter = ({func}) => {
     
     
 
-const DataView = ({countrylist,func,weatherData}) => {
-
+const DataView = ({countrylist,func}) => {
 
     if(countrylist.length > 1 && countrylist.length < 11)
     {
@@ -37,13 +36,28 @@ const DataView = ({countrylist,func,weatherData}) => {
     }
     else if(countrylist.length === 1)
     {
-        return(<SingleCountryView singleCountry={countrylist[0]} weatherData={weatherData}></SingleCountryView>)
+        return(<SingleCountryView singleCountry={countrylist[0]}></SingleCountryView>)
        
     }
 }
 
-const SingleCountryView = ({singleCountry,weatherData}) => {
+const SingleCountryView = ({singleCountry}) => {
     
+    const [weatherData,getWeatherdata] = useState([])
+    const wsApiKey = process.env.REACT_APP_API_KEY
+    const apiQuery  = `http://api.weatherstack.com/current?access_key=${wsApiKey}&query=${singleCountry.capital}` 
+    
+    componentWillMount()
+    {
+        renderWeatherData();
+    }
+
+    const renderWeatherData = () => {
+
+        Axios.get(apiQuery).then(response => getWeatherdata(response.data))
+    }
+    
+
     return(<div>
         <h1>{singleCountry.name}</h1>
         <p>Capital: {singleCountry.capital}</p>
@@ -55,11 +69,13 @@ const SingleCountryView = ({singleCountry,weatherData}) => {
         <img src={singleCountry.flag} style={{maxHeight:"80px",maxWidth:"80px"}} alt="flag"></img>
         <WeatherForecast capital={singleCountry.capital} weatherData={weatherData}/>
     </div>)
+    }
+   
     
-}
 
 const WeatherForecast = ({capital,weatherData}) => {
 
+    console.log(weatherData)  
     return(<div>
         <h2>Weather in {capital}</h2>
         <p><span style={{fontWeight:"bold"}}>Temperature:</span>{weatherData.current.temperature}</p>
@@ -76,8 +92,6 @@ const App = () => {
 
     const [allCountries,getCountries] = useState([])
     const [shownCountries,changeShownData] = useState([])
-    const [weatherData,setWeatherData] = useState([])
-    const wsApiKey = process.env.REACT_APP_API_KEY
 
     const filterCountries = (event) => {
         
@@ -98,16 +112,7 @@ const App = () => {
     const singleCountryView = (country) => {
        
         changeShownData([country])
-        setWeatherData(() => 
-            useEffect(() => {
-                const apiQuery = `http://api.weatherstack.com/current?access_key=${wsApiKey}&query=${country.capital}` 
-                Axios.get(apiQuery)
-                .then(response => {
-                return(response.data)
-                })
-        })
-
-        )
+        
     }
 
     useEffect(() => {
@@ -118,14 +123,14 @@ const App = () => {
 
     },[])
 
-    
+
 
     
 
 return(
 <div>
 <Filter func={filterCountries}></Filter>
-<DataView countrylist={shownCountries} func={singleCountryView} weatherData={weatherData}></DataView>
+<DataView countrylist={shownCountries} func={singleCountryView}></DataView>
 </div>)
 }
 

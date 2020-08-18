@@ -1,5 +1,6 @@
 import React, { useState,useEffect } from 'react'
 import axios from 'axios' 
+import contactService from "../services/contacts"
 
 const Persons = ({contacts}) => {
 
@@ -56,9 +57,14 @@ const App = () => {
 
     if(!found)
     {
-      let newPersons = persons.concat({name: newContact.name,number: newContact.number})
-      setPersons(newPersons)
-      changeVisualData(newPersons)
+      contactService
+        .createNew(newContact)
+        .then(rNewContact => {
+          let newPersons = persons.concat({name: rNewContact.name,number: rNewContact.number})
+          setPersons(newPersons)
+          changeVisualData(newPersons)
+        })
+
     }
     
   }
@@ -91,12 +97,11 @@ const App = () => {
   }
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/db')
-      .then(response => {
-        setPersons(response.data.persons)
-        changeVisualData(response.data.persons)
-        
+    contactService
+      .getContacts()
+        .then(initialContacts => {
+          setPersons(initialContacts)
+          changeVisualData(initialContacts)
       })
   }, [])
 
