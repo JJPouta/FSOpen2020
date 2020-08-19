@@ -35,11 +35,34 @@ const AddContacts = ({changeFunc,addFunc}) => (
   </form>
 )
 
+const Notifications = ({message,messageType}) => {
+
+
+
+switch (messageType) {
+  case "addEvent":
+    return(<div style={{border: "2px solid green",color:"green",fontSize:"14pt"}}>Added {message}</div>)
+  case "deletionEvent":
+    return(<div style={{border: "2px solid red",color:"red",fontSize:"14pt"}}>Contact {message} has been removed</div>)
+  case "updateEvent":
+    return(<div style={{border: "2px solid blue",color:"blue",fontSize:"14pt"}}>Number for contact {message} has been updated</div>)
+  default:
+    return(<div>
+      
+    </div>)
+}
+
+
+}
+
+
 const App = () => {
  
   const [ persons, setPersons] = useState([])
   const [ newContact, setNewContact ] = useState('')
   const [ visualData, changeVisualData] = useState(persons)
+  const [ notification,setNotification] = useState("")
+
 
   const addContact = (event) => {
     event.preventDefault()
@@ -59,7 +82,9 @@ const App = () => {
         .updateExisting(person.id,newContact).then(window.location.reload())
         
         found = true
-        
+        setNotification({...notification,
+          name: person.name,
+          type: "updateEvent"})
 
       }
     })
@@ -69,7 +94,16 @@ const App = () => {
       // Luodaan uusi ja ladataan sivu uudelleen
       contactService
         .createNew(newContact)
-        .then(window.location.reload())}
+        .then(setNotification({...notification,
+          name: newContact.name,
+          type: "addEvent"}))
+        .then(window.location.reload())
+        
+      
+        
+      
+      
+    }
         
 
     // Nollataan input kentät
@@ -121,6 +155,9 @@ const App = () => {
     contactService
     .deleteContact(id)
 
+    setNotification({...notification,
+      name: name,
+      type: "deletionEvent"})
     
   }
   
@@ -136,6 +173,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notifications message={notification.name} messageType={notification.type}/>
       <Filter func={filterContacts}/>
       <h2>Add new contact</h2>
       <AddContacts changeFunc={handleChange} addFunc={addContact}/>

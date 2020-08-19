@@ -1,12 +1,13 @@
 import React, {useEffect,useState} from 'react';
 import Axios from "axios";
 
+
   
 const Filter = ({func}) => {
     
     return(<form>
             <div>
-            Find country <input id="nameFilter" placeholder="Enter county" onChange={func}/>
+            Find country <input id="nameFilter" placeholder="Enter county" onChange={(ev) => func(ev)}/>
             </div>
     </form>)
 
@@ -16,6 +17,20 @@ const Filter = ({func}) => {
     
 
 const DataView = ({countrylist,func}) => {
+
+    const [weatherData,getWeatherdata] = useState([])
+    const [subs,changeSubs] = useState(0)
+    const [capital,changeCapital] = useState("")
+    const wsApiKey = process.env.REACT_APP_API_KEY
+    
+    const apiQuery  = `http://api.weatherstack.com/current?access_key=${wsApiKey}&query=${capital}`
+    
+    const getWeather = () => {
+        Axios.get(apiQuery).then(response => {console.log(response.data)
+            getWeatherdata(response.data)})
+    }
+    
+    useEffect(getWeather,[subs])
 
     if(countrylist.length > 1 && countrylist.length < 11)
     {
@@ -36,29 +51,15 @@ const DataView = ({countrylist,func}) => {
     }
     else if(countrylist.length === 1)
     {
-        return(<SingleCountryView singleCountry={countrylist[0]}></SingleCountryView>)
-       
+        changeCapital(countrylist[0].capital)
+        changeSubs(subs + 1)
+        return(<SingleCountryView singleCountry={countrylist[0]} weatherData={weatherData}/>)
     }
 }
 
-const SingleCountryView = ({singleCountry}) => {
+const SingleCountryView = ({singleCountry,weatherData}) => {
     
-    const [weatherData,getWeatherdata] = useState([])
-    const wsApiKey = process.env.REACT_APP_API_KEY
-    const apiQuery  = `http://api.weatherstack.com/current?access_key=${wsApiKey}&query=${singleCountry.capital}` 
-    
-    componentWillMount()
-    {
-        renderWeatherData();
-    }
-
-    const renderWeatherData = () => {
-
-        Axios.get(apiQuery).then(response => getWeatherdata(response.data))
-    }
-    
-
-    return(<div>
+   return(<div>
         <h1>{singleCountry.name}</h1>
         <p>Capital: {singleCountry.capital}</p>
         <p>Population: {singleCountry.population}</p>
@@ -69,7 +70,7 @@ const SingleCountryView = ({singleCountry}) => {
         <img src={singleCountry.flag} style={{maxHeight:"80px",maxWidth:"80px"}} alt="flag"></img>
         <WeatherForecast capital={singleCountry.capital} weatherData={weatherData}/>
     </div>)
-    }
+}
    
     
 
@@ -92,9 +93,9 @@ const App = () => {
 
     const [allCountries,getCountries] = useState([])
     const [shownCountries,changeShownData] = useState([])
+    
 
     const filterCountries = (event) => {
-        
         let inputText = event.target.value;
         
         // Jos kenttään on syötetty tietoa
@@ -112,7 +113,6 @@ const App = () => {
     const singleCountryView = (country) => {
        
         changeShownData([country])
-        
     }
 
     useEffect(() => {
