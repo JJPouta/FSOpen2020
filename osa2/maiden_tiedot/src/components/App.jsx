@@ -1,4 +1,4 @@
-import React, {useEffect,useState} from 'react';
+import React, {useEffect,useState,useRef} from 'react';
 import Axios from "axios";
 
 
@@ -60,12 +60,12 @@ const SingleCountryView = ({singleCountry,weatherData}) => {
 
 const WeatherForecast = ({capital,weatherData}) => {
 
-    console.log(weatherData)  
+    console.log(weatherData)
     return(<div>
         <h2>Weather in {capital}</h2>
-        <p><span style={{fontWeight:"bold"}}>Temperature:</span>{weatherData.current.temperature}</p>
-        <img src={weatherData.weather_icons[0]} alt="weathericon"></img>
-        <p><span style={{fontWeight:"bold"}}>Wind:</span>{weatherData.current.wind_speed}</p>
+        <p><span style={{fontWeight:"bold"}}>Temperature: </span>{weatherData.current.temperature} celsius</p>
+        <img src={weatherData.current.weather_icons[0]} alt="weathericon"></img>
+    <p><span style={{fontWeight:"bold"}}>Wind: </span>{weatherData.current.wind_speed} m/s wind direction {weatherData.current.wind_dir}</p>
     </div>
 
     )
@@ -77,11 +77,12 @@ const App = () => {
 
     const [allCountries,getCountries] = useState([])
     const [shownCountries,changeShownData] = useState([])
-    const [weatherData,getWeatherdata] = useState([])
-    const [capital,changeCapital] = useState("")
+    const [apiQuery,buildApiQuery] = useState("");
+    const weatherData = useRef([])
+    const singleCountry = useRef(null)
     const wsApiKey = process.env.REACT_APP_API_KEY
     
-    const apiQuery  = `http://api.weatherstack.com/current?access_key=${wsApiKey}&query=${capital}`
+    
     
     const filterCountries = (event) => {
         let inputText = event.target.value;
@@ -99,7 +100,9 @@ const App = () => {
     }
     
     const singleCountryView = (country) => {
-        changeCapital(country.capital)
+        singleCountry.current = country;
+        buildApiQuery(`http://api.weatherstack.com/current?access_key=${wsApiKey}&query=${country.capital}`)
+        
     }
 
     // Kaikkien maiden hakeminen alussa
@@ -115,10 +118,13 @@ const App = () => {
     // Säätietojen haku
     useEffect(() => 
     {
+        if(apiQuery === ""){return;}
         console.log("WeatherQuery Fired")
-        console.log(apiQuery)
-        Axios.get(apiQuery).then(response => {console.log(response.data)
-            getWeatherdata(response.data)}).then(changeShownData([country]))
+        Axios.get(apiQuery).then(response => 
+        {weatherData.current = response.data
+            changeShownData([singleCountry.current])
+        })
+            
     },[apiQuery])
 
 
@@ -127,7 +133,7 @@ const App = () => {
 return(
 <div>
 <Filter func={filterCountries}></Filter>
-<DataView countrylist={shownCountries} func={singleCountryView}></DataView>
+<DataView countrylist={shownCountries} func={singleCountryView} weatherData={weatherData.current}></DataView>
 </div>)
 }
 
