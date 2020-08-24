@@ -77,9 +77,9 @@ const App = () => {
         // Poistutaan jos cancel tai ruksi
         if(!res){return;}
         
-        // Päivitetään numero ja ladataan sivu uudelleen
+        // Päivitetään numero ja vaihdetaan tila
         contactService
-        .updateExisting(person.id,newContact).then(window.location.reload())
+        .updateExisting(person.id,newContact)
         
         found = true
         setNotification({...notification,
@@ -91,18 +91,13 @@ const App = () => {
 
     if(!found)
     {
-      // Luodaan uusi ja ladataan sivu uudelleen
+      // Luodaan uusi ja vaihdetaan tila
       contactService
         .createNew(newContact)
         .then(setNotification({...notification,
           name: newContact.name,
           type: "addEvent"}))
-        .then(window.location.reload())
         
-      
-        
-      
-      
     }
         
 
@@ -147,17 +142,14 @@ const App = () => {
     // Poistutaan jos cancel tai ruksi
     if(!res){return;}
     
-    let newPersons = persons.filter(person => person.id !== id)
-
-    setPersons(newPersons)
-    changeVisualData(newPersons)
-
+    
+    // Poistetaan ja vaihdetaan tila
     contactService
-    .deleteContact(id)
-
-    setNotification({...notification,
+    .deleteContact(id).then(setNotification({...notification,
       name: name,
-      type: "deletionEvent"})
+      type: "deletionEvent"}))
+
+    
     
   }
   
@@ -168,7 +160,7 @@ const App = () => {
           setPersons(initialContacts)
           changeVisualData(initialContacts)
       })
-  }, [])
+  }, [notification])
 
   return (
     <div>

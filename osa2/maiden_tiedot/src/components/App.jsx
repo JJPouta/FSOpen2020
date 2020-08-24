@@ -16,21 +16,7 @@ const Filter = ({func}) => {
     
     
 
-const DataView = ({countrylist,func}) => {
-
-    const [weatherData,getWeatherdata] = useState([])
-    const [subs,changeSubs] = useState(0)
-    const [capital,changeCapital] = useState("")
-    const wsApiKey = process.env.REACT_APP_API_KEY
-    
-    const apiQuery  = `http://api.weatherstack.com/current?access_key=${wsApiKey}&query=${capital}`
-    
-    const getWeather = () => {
-        Axios.get(apiQuery).then(response => {console.log(response.data)
-            getWeatherdata(response.data)})
-    }
-    
-    useEffect(getWeather,[subs])
+const DataView = ({countrylist,func,weatherData}) => {
 
     if(countrylist.length > 1 && countrylist.length < 11)
     {
@@ -51,8 +37,6 @@ const DataView = ({countrylist,func}) => {
     }
     else if(countrylist.length === 1)
     {
-        changeCapital(countrylist[0].capital)
-        changeSubs(subs + 1)
         return(<SingleCountryView singleCountry={countrylist[0]} weatherData={weatherData}/>)
     }
 }
@@ -93,8 +77,12 @@ const App = () => {
 
     const [allCountries,getCountries] = useState([])
     const [shownCountries,changeShownData] = useState([])
+    const [weatherData,getWeatherdata] = useState([])
+    const [capital,changeCapital] = useState("")
+    const wsApiKey = process.env.REACT_APP_API_KEY
     
-
+    const apiQuery  = `http://api.weatherstack.com/current?access_key=${wsApiKey}&query=${capital}`
+    
     const filterCountries = (event) => {
         let inputText = event.target.value;
         
@@ -111,11 +99,12 @@ const App = () => {
     }
     
     const singleCountryView = (country) => {
-       
-        changeShownData([country])
+        changeCapital(country.capital)
     }
 
+    // Kaikkien maiden hakeminen alussa
     useEffect(() => {
+        console.log("CountryQuery Fired")
         Axios.get("https://restcountries.eu/rest/v2/all")
         .then(response => {
         getCountries(response.data)
@@ -123,6 +112,14 @@ const App = () => {
 
     },[])
 
+    // Säätietojen haku
+    useEffect(() => 
+    {
+        console.log("WeatherQuery Fired")
+        console.log(apiQuery)
+        Axios.get(apiQuery).then(response => {console.log(response.data)
+            getWeatherdata(response.data)}).then(changeShownData([country]))
+    },[apiQuery])
 
 
     
