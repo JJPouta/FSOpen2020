@@ -1,6 +1,12 @@
 import React, { useState,useEffect } from 'react'
 import contactService from "../services/contacts"
 
+
+const DELETE_EVENT = "deletionEvent";
+const UPDATE_EVENT = "updateEvent";
+const ADDITION_EVENT = "addEvent";
+const ERROR_EVENT = "errEvent";
+
 const Persons = ({contacts,delFunc}) => {
 
   if(contacts.length > 0)
@@ -37,15 +43,15 @@ const AddContacts = ({changeFunc,addFunc}) => (
 
 const Notifications = ({message,messageType}) => {
 
-
-
 switch (messageType) {
-  case "addEvent":
+  case ADDITION_EVENT:
     return(<div style={{border: "2px solid green",color:"green",fontSize:"14pt"}}>Added {message}</div>)
-  case "deletionEvent":
+  case DELETE_EVENT:
     return(<div style={{border: "2px solid red",color:"red",fontSize:"14pt"}}>Contact {message} has been removed</div>)
-  case "updateEvent":
+  case UPDATE_EVENT:
     return(<div style={{border: "2px solid blue",color:"blue",fontSize:"14pt"}}>Number for contact {message} has been updated</div>)
+  case ERROR_EVENT:
+    return(<div style={{border: "3px dashed red",color:"red",fontSize:"14pt"}}>Contact {message} has been already been removed from server</div>)
   default:
     return(<div>
       
@@ -84,7 +90,7 @@ const App = () => {
         found = true
         setNotification({...notification,
           name: person.name,
-          type: "updateEvent"})
+          type: UPDATE_EVENT})
 
       }
     })
@@ -96,7 +102,7 @@ const App = () => {
         .createNew(newContact)
         .then(setNotification({...notification,
           name: newContact.name,
-          type: "addEvent"}))
+          type: ADDITION_EVENT}))
         
     }
         
@@ -104,6 +110,31 @@ const App = () => {
     // Nollataan input kentät
     document.getElementById("nameInput").value = null;
     document.getElementById("numberInput").value = null;
+  }
+  const removeContact = (id,name) => {
+
+
+    let res = window.confirm(`Do you want to delete contact: ${name}?`)
+    
+    // Poistutaan jos cancel tai ruksi
+    if(!res){return;}
+    
+    
+    // Poistetaan ja vaihdetaan tila
+    contactService
+    .deleteContact(id)
+    .then(setNotification({...notification,
+      name: name,
+      type: DELETE_EVENT}))
+      .catch(() => errorHandler(name))
+      
+  }
+
+  const errorHandler = (contactName) => {
+
+    setNotification({...notification,
+      name: contactName,
+      type: ERROR_EVENT})
   }
 
 
@@ -134,24 +165,7 @@ const App = () => {
     }
   }
 
-  const removeContact = (id,name) => {
-
-
-    let res = window.confirm(`Do you want to delete contact: ${name}?`)
-    
-    // Poistutaan jos cancel tai ruksi
-    if(!res){return;}
-    
-    
-    // Poistetaan ja vaihdetaan tila
-    contactService
-    .deleteContact(id).then(setNotification({...notification,
-      name: name,
-      type: "deletionEvent"}))
-
-    
-    
-  }
+  
   
   useEffect(() => {
     contactService
