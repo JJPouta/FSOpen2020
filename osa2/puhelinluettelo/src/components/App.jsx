@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState,useEffect,useRef} from 'react'
 import contactService from "../services/contacts"
 
 
@@ -85,13 +85,14 @@ const App = () => {
         
         // Päivitetään numero ja vaihdetaan tila
         contactService
-        .updateExisting(person.id,newContact)
-        
-        found = true
-        setNotification({...notification,
+        .updateExisting(person.id,newContact).then(
+          setNotification({...notification,
           name: person.name,
-          type: UPDATE_EVENT})
-
+          type: UPDATE_EVENT,
+          id: prev => prev + 1
+          }))
+          
+          found = true
       }
     })
 
@@ -102,7 +103,9 @@ const App = () => {
         .createNew(newContact)
         .then(setNotification({...notification,
           name: newContact.name,
-          type: ADDITION_EVENT}))
+          type: ADDITION_EVENT,
+          id: prev => prev + 1})
+          )
         
     }
         
@@ -123,10 +126,12 @@ const App = () => {
     // Poistetaan ja vaihdetaan tila
     contactService
     .deleteContact(id)
-    .then(setNotification({...notification,
-      name: name,
-      type: DELETE_EVENT}))
-      .catch(() => errorHandler(name))
+    .then(
+        setNotification({...notification,
+          name: name,
+          type: DELETE_EVENT,
+          id: prev => prev + 1})
+      ).catch(() => errorHandler(name))
       
   }
 
@@ -134,7 +139,8 @@ const App = () => {
 
     setNotification({...notification,
       name: contactName,
-      type: ERROR_EVENT})
+      type: ERROR_EVENT,
+      id: prev => prev + 1})
   }
 
 
