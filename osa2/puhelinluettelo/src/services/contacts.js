@@ -1,10 +1,12 @@
 import axios from 'axios'
 const baseUrl = '/api/persons'
-
+var config = {headers: {'Content-Type': 'application/json','Cache-Control' : 'no-cache'}};
 
 const getContacts = () => {
-    const request = axios.get(baseUrl)
-    return request.then(response => {return response.data})
+    const request = axios.get(baseUrl,config)
+    return request.then(response => {
+        console.log(response.data)
+        return response.data})
 
 
 

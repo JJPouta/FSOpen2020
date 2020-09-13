@@ -174,14 +174,22 @@ const App = () => {
   
   // Kontaktitietojen haku tietokannasta ja numeroiden päivitys
   useEffect(() => {
-    contactService
-      .getContacts()
-        .then(initialContacts => {
-          console.log(initialContacts)
-          console.log(renderNumbers)
-          setPersons(initialContacts)
-          changeVisualData(initialContacts)
-      })
+
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+      // Lisästään 1 sek delay.. hakee välillä vanhaa dataa
+      wait(1000)
+      .then(() => {
+      contactService
+        .getContacts()
+          .then(initialContacts => {
+            console.log(initialContacts)
+            console.log(renderNumbers)
+            setPersons(initialContacts)
+            changeVisualData(initialContacts)
+          })})
+    
+      
   }, [renderNumbers])
 
   return (
