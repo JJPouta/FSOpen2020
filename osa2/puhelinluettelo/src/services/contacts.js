@@ -1,9 +1,6 @@
 import axios from 'axios'
 const baseUrl = '/api/persons'
 
-// Debug sijainti @localhost
-// const baseUrl = '/persons'
-
 
 const getContacts = () => {
     const request = axios.get(baseUrl)

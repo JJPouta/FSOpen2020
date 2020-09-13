@@ -1,4 +1,4 @@
-import React, { useState,useEffect,useRef} from 'react'
+import React, { useState,useEffect} from 'react'
 import contactService from "../services/contacts"
 
 
@@ -68,7 +68,7 @@ const App = () => {
   const [ newContact, setNewContact ] = useState('')
   const [ visualData, changeVisualData] = useState(persons)
   const [ notification,setNotification] = useState("")
-
+  const [ renderNumbers, incRenderNumbers] = useState(0)
 
   const addContact = (event) => {
     event.preventDefault()
@@ -87,11 +87,11 @@ const App = () => {
         contactService
         .updateExisting(person.id,newContact).then(
           setNotification({...notification,
-          name: person.name,
-          type: UPDATE_EVENT,
-          id: prev => prev + 1
+          name: newContact.name,
+          type: UPDATE_EVENT
           }))
-          
+          .then(incRenderNumbers(prev => prev + 1))
+      
           found = true
       }
     })
@@ -103,10 +103,10 @@ const App = () => {
         .createNew(newContact)
         .then(setNotification({...notification,
           name: newContact.name,
-          type: ADDITION_EVENT,
-          id: prev => prev + 1})
+          type: ADDITION_EVENT
+          })
           )
-        
+          .then(incRenderNumbers(prev => prev + 1))
     }
         
 
@@ -129,18 +129,18 @@ const App = () => {
     .then(
         setNotification({...notification,
           name: name,
-          type: DELETE_EVENT,
-          id: prev => prev + 1})
+          type: DELETE_EVENT
+          })
       ).catch(() => errorHandler(name))
-      
+      .then(incRenderNumbers(prev => prev + 1))
   }
 
   const errorHandler = (contactName) => {
 
     setNotification({...notification,
       name: contactName,
-      type: ERROR_EVENT,
-      id: prev => prev + 1})
+      type: ERROR_EVENT
+      })
   }
 
 
@@ -172,15 +172,17 @@ const App = () => {
   }
 
   
-  
+  // Kontaktitietojen haku tietokannasta ja numeroiden päivitys
   useEffect(() => {
     contactService
       .getContacts()
         .then(initialContacts => {
+          console.log(initialContacts)
+          console.log(renderNumbers)
           setPersons(initialContacts)
           changeVisualData(initialContacts)
       })
-  }, [notification])
+  }, [renderNumbers])
 
   return (
     <div>
