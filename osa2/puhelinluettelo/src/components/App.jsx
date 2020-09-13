@@ -5,7 +5,8 @@ import contactService from "../services/contacts"
 const DELETE_EVENT = "deletionEvent";
 const UPDATE_EVENT = "updateEvent";
 const ADDITION_EVENT = "addEvent";
-const ERROR_EVENT = "errEvent";
+const DEL_ERROR_EVENT = "errEvent";
+const ADD_ERROR_EVENT = "addErrEvent"
 
 const Persons = ({contacts,delFunc}) => {
 
@@ -50,8 +51,10 @@ switch (messageType) {
     return(<div style={{border: "2px solid red",color:"red",fontSize:"14pt"}}>Contact {message} has been removed</div>)
   case UPDATE_EVENT:
     return(<div style={{border: "2px solid blue",color:"blue",fontSize:"14pt"}}>Number for contact {message} has been updated</div>)
-  case ERROR_EVENT:
+  case DEL_ERROR_EVENT:
     return(<div style={{border: "3px dashed red",color:"red",fontSize:"14pt"}}>Contact {message} has been already been removed from server</div>)
+  case ADD_ERROR_EVENT:
+    return(<div style={{border: "3px inset red",color:"red",fontSize:"14pt"}}>{message}</div>)
   default:
     return(<div>
       
@@ -99,14 +102,16 @@ const App = () => {
     if(!found)
     {
       // Luodaan uusi ja vaihdetaan tila
-      contactService
-        .createNew(newContact)
+        contactService.createNew(newContact)
         .then(setNotification({...notification,
           name: newContact.name,
           type: ADDITION_EVENT
           })
-          )
-          .then(incRenderNumbers(prev => prev + 1))
+        ).catch(error => addErrorHandler(error.response.data))
+        
+          
+        incRenderNumbers(prev => prev + 1)
+      
     }
         
 
@@ -131,18 +136,27 @@ const App = () => {
           name: name,
           type: DELETE_EVENT
           })
-      ).catch(() => errorHandler(name))
+      ).catch(() => delErrorHandler(name))
       .then(incRenderNumbers(prev => prev + 1))
   }
 
-  const errorHandler = (contactName) => {
+  const delErrorHandler = (contactName) => {
 
     setNotification({...notification,
       name: contactName,
-      type: ERROR_EVENT
+      type: DEL_ERROR_EVENT
       })
   }
 
+  const addErrorHandler = (errorObj) => {
+
+    console.log(errorObj)
+    setNotification({...notification,
+      name: errorObj["error"],
+      type: ADD_ERROR_EVENT,
+      })
+
+  }
 
   const handleChange = (event) => {
     if(event.target.id === "nameInput")
