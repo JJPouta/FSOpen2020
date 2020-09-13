@@ -101,17 +101,27 @@ const App = () => {
 
     if(!found)
     {
-      // Luodaan uusi ja vaihdetaan tila
-        contactService.createNew(newContact)
-        .then(setNotification({...notification,
+      let err = false;
+
+      // Luodaaan, mutta peruutetaan ja varoitetaan, jos validointi ei mene läpi
+      createWithValidation();
+
+      async function createWithValidation(){
+
+        let p1 = await contactService.createNew(newContact)
+        .catch(error => {addErrorHandler(error.response.data)
+        err = true})
+
+        if(!err)
+        {
+          setNotification({...notification,
           name: newContact.name,
           type: ADDITION_EVENT
           })
-        ).catch(error => addErrorHandler(error.response.data))
-        
-          
-        incRenderNumbers(prev => prev + 1)
-      
+          incRenderNumbers(prev => prev + 1)
+
+        }
+      }
     }
         
 
