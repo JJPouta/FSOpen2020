@@ -4,9 +4,7 @@ var config = {headers: {'Content-Type': 'application/json','Cache-Control' : 'no
 
 const getContacts = () => {
     const request = axios.get(baseUrl,config)
-    return request.then(response => {
-        console.log(response.data)
-        return response.data})
+    return request.then(response => response.data)
 
 
 

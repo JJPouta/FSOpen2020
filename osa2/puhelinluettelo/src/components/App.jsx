@@ -108,7 +108,7 @@ const App = () => {
 
       async function createWithValidation(){
 
-        let p1 = await contactService.createNew(newContact)
+        await contactService.createNew(newContact)
         .catch(error => {addErrorHandler(error.response.data)
         err = true})
 
@@ -207,8 +207,6 @@ const App = () => {
       contactService
         .getContacts()
           .then(initialContacts => {
-            console.log(initialContacts)
-            console.log(renderNumbers)
             setPersons(initialContacts)
             changeVisualData(initialContacts)
           })})
